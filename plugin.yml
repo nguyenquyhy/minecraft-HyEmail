@@ -1,0 +1,37 @@
+name: HyEmail
+main: me.nguyenquyhy.HyEmail.HyEmail
+version: 0.1.0
+commands:
+   email:
+      aliases: [HyEmail]
+      description: Display Help Menu
+      permission: HyEmail.inbox
+      usage: /email
+   send:
+      description: Send email to a user
+      permission: HyEmail.send
+      usage: /send <player> <message>
+   inbox:
+      description: View your inbox
+      permission: HyEmail.inbox
+      usage: /inbox
+   outbox:
+      description: View your outbox
+      permission: HyEmail.outbox
+      usage: /outbox
+   mailboxes:
+      description: view active mailboxes
+      permission: HyEmail.admin
+      usage: /mailboxes
+   clearmailbox:
+      description: clear an active mailbox
+      permission: HyEmail.admin
+      usage: /clearmailbox <player>
+   purgemailboxes:
+      description: Purge expired messages rom database
+      permission: HyEmail.admin
+      usage: /purgemailboxes
+   showinbox:
+      description: Show the inbox for a particular user (mainly for command block)
+      permission: HyEmail.admin
+      usage: /showinbox

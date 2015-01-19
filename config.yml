@@ -1,0 +1,10 @@
+# MaxInboxSize: Max Mailbox Size Per User
+# MailExpiration: Number OF DAYS before a read message expires (and is deleted)
+# ShowNewMessage: Show New Mail on player join
+# DelayInSeconds: Delay IN SECONDS before new message notification is displayed.
+#
+MaxMailboxSize: 6
+MailExpiration: 14
+OnPlayerJoin:
+  ShowNewMessages: true
+  DelayInSeconds: 3
