@@ -42,8 +42,8 @@ public class Outbox implements CommandExecutor {
 			sender.sendMessage(plugin.GOLD
 					+ "- ID ----- TO ----------- DATE ------");
 			while (rs.next()) {
-				String isread = rs.getString("read");
-				if (isread.contains("NO")) {
+				Boolean isread = rs.getTimestamp("read") != null;
+				if (!isread) {
 					sender.sendMessage(plugin.GRAY + "  [" + plugin.GREEN
 							+ rs.getInt("id") + plugin.GRAY + "]" + "         "
 							+ rs.getString("target") + "          "
@@ -66,7 +66,7 @@ public class Outbox implements CommandExecutor {
 						+ plugin.GOLD
 						+ "The database is busy. Please wait a moment before trying again...");
 			} else {
-				player.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
+				sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
 						+ "Error: " + plugin.WHITE + e);
 			}
 		}

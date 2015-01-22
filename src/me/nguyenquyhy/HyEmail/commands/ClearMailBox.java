@@ -7,7 +7,6 @@ import me.nguyenquyhy.HyEmail.HyEmail;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class ClearMailBox implements CommandExecutor {
 	public HyEmail plugin;
@@ -20,24 +19,22 @@ public class ClearMailBox implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
-		Player player = null;
-		if (sender instanceof Player) {
-			player = (Player) sender;
-		}
 
 		if (args.length != 1) {
 			sender.sendMessage("/clearmailbox <player>");
 			return true;
 		}
+		String playerName = args[0].toLowerCase();
+
 		java.sql.Statement stmt;
 		Connection con;
 		try {
 			con = service.getConnection();
 			stmt = con.createStatement();
 			stmt.executeUpdate("DELETE FROM HyEmail WHERE target='"
-					+ args[0].toLowerCase() + "'");
+					+ playerName + "'");
 			sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.GREEN
-					+ "Mailbox Cleared.");
+					+ "Mailbox of " + playerName + " Cleared.");
 			return true;
 		} catch (Exception e) {
 			plugin.log.info("[HyEmail] Error: " + e);
@@ -47,7 +44,7 @@ public class ClearMailBox implements CommandExecutor {
 						+ plugin.GOLD
 						+ "The database is busy. Please wait a moment before trying again...");
 			} else {
-				player.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
+				sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
 						+ "Error: " + plugin.WHITE + e);
 			}
 		}

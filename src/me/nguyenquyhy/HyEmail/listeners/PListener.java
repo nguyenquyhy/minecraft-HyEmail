@@ -37,7 +37,7 @@ public class PListener implements Listener {
 				stmt = con.createStatement();
 				rs = stmt
 						.executeQuery("SELECT COUNT(target) AS inboxtotal FROM HyEmail WHERE target='"
-								+ targetnick + "' AND read='NO'");
+								+ targetnick + "' AND read IS NULL");
 				final int unreadCount = rs.getInt("inboxtotal");
 				rs.close();
 				if (player.hasPermission("HyEmail.inbox") && unreadCount != 0) {

@@ -1,7 +1,9 @@
 package me.nguyenquyhy.HyEmail.commands;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 import me.nguyenquyhy.HyEmail.DBConnection;
 import me.nguyenquyhy.HyEmail.HyEmail;
@@ -61,13 +63,13 @@ public class Inbox implements CommandExecutor {
 
 			rs = stmt.executeQuery("SELECT * FROM HyEmail WHERE id='" + emailId
 					+ "' AND target='" + playerName + "'");
-			String date = rs.getString("date");
+			Timestamp sentTime = rs.getTimestamp("date");
 			String id = rs.getString("id");
-			String expiration = rs.getString("expiration");
+			Timestamp expiration = rs.getTimestamp("expiration");
 			Boolean updateExpiration = false;
-			if (expiration.equalsIgnoreCase("NONE")) {
+			if (expiration == null) {
 				updateExpiration = true;
-				expiration = plugin.getExpiration(date);
+				expiration = new Timestamp(plugin.getExpiration().getTime());
 			}
 			sender.sendMessage(plugin.GOLD + "Message Open: " + plugin.WHITE
 					+ id);
@@ -75,22 +77,27 @@ public class Inbox implements CommandExecutor {
 				sender.sendMessage(plugin.GRAY + " From: " + plugin.GREEN
 						+ rs.getString("sender"));
 				sender.sendMessage(plugin.GRAY + " Date: " + plugin.WHITE
-						+ date);
-				sender.sendMessage(plugin.GRAY + " Expires: " + plugin.WHITE
-						+ expiration);
+						+ plugin.formatDate(sentTime) + plugin.GRAY
+						+ ". Expires: " + plugin.WHITE
+						+ plugin.formatDate(expiration));
 				sender.sendMessage(plugin.GRAY + " Message: " + plugin.GREEN
 						+ rs.getString("message"));
-
-			}
-			if (updateExpiration) {
-				stmt.executeUpdate("UPDATE HyEmail SET read='YES', expiration='"
-						+ expiration
-						+ "' WHERE id='"
-						+ emailId
-						+ "' AND target='" + playerName + "'");
 			}
 			rs.close();
 			stmt.close();
+
+			if (updateExpiration) {
+				Timestamp readTime = new Timestamp(plugin.getCurrentDTG()
+						.getTime());
+				PreparedStatement statement = con
+						.prepareStatement("UPDATE HyEmail SET read = ?, expiration = ? WHERE id = ? AND target = ?");
+				statement.setTimestamp(1, readTime);
+				statement.setTimestamp(2, expiration);
+				statement.setString(3, emailId);
+				statement.setString(4, playerName);
+				statement.executeUpdate();
+				statement.close();
+			}
 		} catch (Exception e) {
 			if (e.toString().contains("ResultSet closed")) {
 				sender.sendMessage(plugin.GRAY
@@ -175,19 +182,19 @@ public class Inbox implements CommandExecutor {
 				sender.sendMessage(plugin.GOLD
 						+ "- ID ----- FROM ----------- DATE ------");
 				while (rs.next()) {
-					String isread = rs.getString("read");
-					if (isread.contains("NO")) {
+					Boolean isread = rs.getTimestamp("read") != null;
+					if (!isread) {
 						// Unread messages
 						sender.sendMessage(plugin.GRAY + "  [" + plugin.GREEN
 								+ rs.getInt("id") + plugin.GRAY + "]"
 								+ "         " + rs.getString("sender")
-								+ "        " + rs.getString("date"));
+								+ "        " + plugin.formatDate(rs.getTimestamp("date")));
 					} else {
 						// Read messages
 						sender.sendMessage(plugin.GRAY + "  ["
 								+ rs.getInt("id") + plugin.GRAY + "]"
 								+ "         " + rs.getString("sender")
-								+ "        " + rs.getString("date"));
+								+ "        " + plugin.formatDate(rs.getTimestamp("date")));
 					}
 				}
 				rs.close();
@@ -203,7 +210,7 @@ public class Inbox implements CommandExecutor {
 						+ plugin.GOLD
 						+ "The database is busy. Please wait a moment before trying again...");
 			} else {
-				player.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
+				sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
 						+ "Error: " + plugin.WHITE + e);
 			}
 		}

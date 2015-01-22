@@ -3,7 +3,9 @@ package me.nguyenquyhy.HyEmail.commands;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 
 import me.nguyenquyhy.HyEmail.DBConnection;
 import me.nguyenquyhy.HyEmail.HyEmail;
@@ -54,7 +56,7 @@ public class Send implements CommandExecutor {
 			}
 			String details = sb.toString();
 
-			String rightNow = plugin.getCurrentDTG();
+			Date rightNow = plugin.getCurrentDTG();
 			String target = plugin.myGetPlayerName(args[0]).toLowerCase();
 
 			ResultSet rs2 = stmt
@@ -78,11 +80,11 @@ public class Send implements CommandExecutor {
 
 				statement.setString(3, target);
 
-				statement.setString(4, rightNow);
+				statement.setTimestamp(4, new Timestamp(rightNow.getTime()));
 				statement.setString(5, details);
 
-				statement.setString(6, "NO");
-				statement.setString(7, "NONE");
+				statement.setTimestamp(6, null);
+				statement.setTimestamp(7, null);
 				statement.executeUpdate();
 				statement.close();
 
@@ -100,14 +102,11 @@ public class Send implements CommandExecutor {
 
 			} else {
 				statement.setString(2, player.getName());
-
 				statement.setString(3, target);
-
-				statement.setString(4, rightNow);
+				statement.setTimestamp(4, new Timestamp(rightNow.getTime()));
 				statement.setString(5, details);
-
-				statement.setString(6, "NO");
-				statement.setString(7, "NONE");
+				statement.setTimestamp(6, null);
+				statement.setTimestamp(7, null);
 				statement.executeUpdate();
 				statement.close();
 
@@ -132,7 +131,7 @@ public class Send implements CommandExecutor {
 						+ plugin.GOLD
 						+ "The database is busy. Please wait a moment before trying again...");
 			} else {
-				player.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
+				sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
 						+ "Error: " + plugin.WHITE + e);
 			}
 		}

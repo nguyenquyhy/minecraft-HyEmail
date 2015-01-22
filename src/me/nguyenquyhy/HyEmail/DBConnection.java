@@ -54,7 +54,7 @@ public class DBConnection {
 		Statement stmt;
 		try {
 			stmt = con.createStatement();
-			String queryC = "CREATE TABLE IF NOT EXISTS HyEmail (id INTEGER PRIMARY KEY, sender varchar(16) collate nocase, target varchar(16) collate nocase, date timestamp, message varchar(30), read varchar(10), expiration timestamp)";
+			String queryC = "CREATE TABLE IF NOT EXISTS HyEmail (id INTEGER PRIMARY KEY, sender varchar(16) collate nocase, target varchar(16) collate nocase, date timestamp, message varchar(30), read timestamp, expiration timestamp)";
 			stmt.executeUpdate(queryC);
 		} catch (Exception e) {
 			plugin.log.info("[HyEmail] " + "Error: " + e);

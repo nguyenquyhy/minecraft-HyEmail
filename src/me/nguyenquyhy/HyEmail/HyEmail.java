@@ -3,10 +3,10 @@ package me.nguyenquyhy.HyEmail;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import me.nguyenquyhy.HyEmail.commands.*;
@@ -87,13 +87,12 @@ public class HyEmail extends JavaPlugin {
 		return pName;
 	}
 
-	public String getCurrentDTG() {
+	public Date getCurrentDTG() {
 		Calendar currentDate = Calendar.getInstance();
-		SimpleDateFormat dtgFormat = new SimpleDateFormat("dd/MMM/yy HH:mm");
-		return dtgFormat.format(currentDate.getTime());
+		return currentDate.getTime();
 	}
 
-	public String getExpiration(String date) {
+	public Date getExpiration() {
 		String mailExpiration = getConfig().getString("MailExpiration");
 		for (char c : mailExpiration.toCharArray()) {
 			if (!Character.isDigit(c)) {
@@ -103,10 +102,14 @@ public class HyEmail extends JavaPlugin {
 		int expire = Integer.parseInt(mailExpiration);
 		Calendar cal = Calendar.getInstance();
 		cal.getTime();
-		cal.add(Calendar.DAY_OF_WEEK, expire);
-		java.util.Date expirationDate = cal.getTime();
+		cal.add(Calendar.DATE, expire);
+		Date expirationDate = cal.getTime();
+		return expirationDate;
+	}
+	
+	public String formatDate(Date date) {
 		SimpleDateFormat dtgFormat = new SimpleDateFormat("dd/MMM/yy HH:mm");
-		return dtgFormat.format(expirationDate);
+		return dtgFormat.format(date);
 	}
 
 	public int expireMail() {
@@ -118,23 +121,15 @@ public class HyEmail extends JavaPlugin {
 			con = service.getConnection();
 			stmt = con.createStatement();
 			Statement stmt2 = con.createStatement();
-			rs = stmt.executeQuery("SELECT * FROM SM_Mail");
+			rs = stmt.executeQuery("SELECT * FROM HyEmail");
 			while (rs.next()) {
-				String date = rs.getString("date");
-				String expiration = rs.getString("expiration");
+				Timestamp expiration = rs.getTimestamp("expiration");
 				String id = rs.getString("id");
-				// IF AN EXPIRATION HAS BEEN APPLIED
-				if (!expiration.equalsIgnoreCase("NONE")) {
-					// CONVERT DATE-STRINGS FROM DB TO DATES
-					Date dateNEW = new SimpleDateFormat("dd/MMM/yy HH:mm",
-							Locale.ENGLISH).parse(date);
-					Date expirationNEW = new SimpleDateFormat(
-							"dd/MMM/yy HH:mm", Locale.ENGLISH)
-							.parse(expiration);
-					// COMPARE STRINGS
-					int HasExpired = dateNEW.compareTo(expirationNEW);
-					if (HasExpired >= 0) {
-						stmt2.executeUpdate("DELETE FROM SM_Mail WHERE id='"
+
+				if (expiration != null) {
+					// IF AN EXPIRATION HAS BEEN APPLIED
+					if (expiration.compareTo(Calendar.getInstance().getTime()) < 0) {
+						stmt2.executeUpdate("DELETE FROM HyEmail WHERE id='"
 								+ id + "'");
 						expirations++;
 					}

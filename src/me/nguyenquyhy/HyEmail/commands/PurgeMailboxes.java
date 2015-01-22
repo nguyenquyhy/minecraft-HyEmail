@@ -10,7 +10,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class PurgeMailboxes implements CommandExecutor {
 
@@ -27,18 +26,15 @@ public class PurgeMailboxes implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
-		Player player = null;
-		if (sender instanceof Player) {
-			player = (Player) sender;
-		}
-
 		ResultSet rs;
 		java.sql.Statement stmt;
 		Connection con;
 		try {
 			con = service.getConnection();
 			stmt = con.createStatement();
-			rs = stmt.executeQuery("DELETE FROM HyEmail WHERE expiration < '" + plugin.getCurrentDTG() + "'");
+			rs = stmt
+					.executeQuery("DELETE FROM HyEmail WHERE expiration IS NOT NULL AND expiration < '"
+							+ plugin.getCurrentDTG() + "'");
 			rs.close();
 
 			sender.sendMessage(plugin.GRAY + "[Email] " + ChatColor.GRAY
@@ -52,11 +48,10 @@ public class PurgeMailboxes implements CommandExecutor {
 						+ plugin.GOLD
 						+ "The database is busy. Please wait a moment before trying again...");
 			} else {
-				player.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
+				sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
 						+ "Error: " + plugin.WHITE + e);
 			}
 		}
 		return true;
-
 	}
 }

@@ -9,7 +9,6 @@ import me.nguyenquyhy.HyEmail.HyEmail;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class MailBoxes implements CommandExecutor {
 
@@ -23,11 +22,6 @@ public class MailBoxes implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
-		Player player = null;
-		if (sender instanceof Player) {
-			player = (Player) sender;
-		}
-
 		ResultSet rs;
 		java.sql.Statement stmt;
 		Connection con;
@@ -49,7 +43,7 @@ public class MailBoxes implements CommandExecutor {
 						+ plugin.GOLD
 						+ "The database is busy. Please wait a moment before trying again...");
 			} else {
-				player.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
+				sender.sendMessage(plugin.GRAY + "[HyEmail] " + plugin.RED
 						+ "Error: " + plugin.WHITE + e);
 			}
 		}
